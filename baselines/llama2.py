@@ -76,14 +76,15 @@ model = GPT2Model.from_pretrained('gpt2')
 def compute_loss(pred):
     return torch.tensor(pred.loss).float().cuda()
 
-trainer = GPT2Trainer(
-    tokenizer=tokenizer,
-    dataset_kwargs={"data_dir": "../dataset/few-shot"},
-    hparams=training_args,
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    data_collator=data_collator,
+    train_dataset=AgendaDataset(tokenizer=tokenizer, data_dir="../dataset/few-shot", type_path="train"),
+    eval_dataset=AgendaDataset(tokenizer=tokenizer, data_dir="../dataset/few-shot", type_path="dev"),
 )
 
 # Train the model
-trainer.train_dataloader()
 trainer.train()
 
 # Print evaluation results
