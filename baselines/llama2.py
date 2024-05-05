@@ -17,7 +17,6 @@ class GPT2Trainer:
         self.dataset_kwargs = dataset_kwargs
         self.hparams = hparams
 
-
     def get_dataloader(self, type_path: str, batch_size: int, shuffle: bool = False) -> DataLoader:
         dataset = AgendaDataset(self.tokenizer, type_path=type_path, **self.dataset_kwargs)
         logger.info('loading %s dataloader...', type_path)
@@ -33,10 +32,6 @@ class GPT2Trainer:
             // self.hparams.gradient_accumulation_steps
             * float(self.hparams.num_train_epochs)
         )
-        scheduler = get_linear_schedule_with_warmup(
-            self.opt, num_warmup_steps=self.hparams.warmup_steps, num_training_steps=t_total
-        )
-        self.lr_scheduler = scheduler
         return dataloader
 
     def val_dataloader(self) -> DataLoader:
