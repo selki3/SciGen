@@ -62,7 +62,7 @@ model = GPT2Model.from_pretrained('gpt2')
 def compute_loss(pred):
     return torch.tensor(pred.loss).float().cuda()
 
-trainer = MyGPT2Trainer(
+trainer = GPT2Trainer(
     model=model,
     tokenizer=tokenizer,
     dataset_kwargs={"data_dir": "../dataset/train/few-shot"},
