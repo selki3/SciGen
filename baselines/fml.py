@@ -30,6 +30,8 @@ def main():
     train_dataset = Table2textDataset(tokenizer, data_dir="../dataset/few-shot", type_path="train", max_source_length=384, max_target_length=384)
     eval_dataset = Table2textDataset(tokenizer, data_dir="../dataset/few-shot", type_path="dev", max_source_length=384, max_target_length=384)
 
+    print(train_dataset)
+    print(eval_dataset)
     training_args = TrainingArguments(output_dir="test_trainer", evaluation_strategy="epoch")
 
     trainer = Trainer(
