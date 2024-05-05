@@ -72,7 +72,7 @@ def main():
     training_args = TrainingArguments("test-trainer", evaluation_strategy="epoch")
 
     model = GPT2Model.from_pretrained('gpt2')
-    train_dataloader = model.get_dataloader("train", batch_size=8e, shuffle=True)
+    train_dataloader = model.get_dataloader("train", batch_size=8, shuffle=True)
     eval_dataloader = model.get_dataloader("dev", batch_size=8)
 
     trainer = Trainer(
@@ -84,7 +84,7 @@ def main():
     )
 
     trainer.train()
-    
+
     
 
 if __name__ == "__main__":
