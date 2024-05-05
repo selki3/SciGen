@@ -72,8 +72,8 @@ def main():
     training_args = TrainingArguments("test-trainer", evaluation_strategy="epoch")
 
     model = GPT2Model.from_pretrained('gpt2')
-    train_dataloader = model.get_dataloader("train", batch_size=8, shuffle=True)
-    eval_dataloader = model.get_dataloader("dev", batch_size=8)
+    train_dataloader = GPT2Trainer.get_dataloader("train", batch_size=8, shuffle=True)
+    eval_dataloader = GPT2Trainer.get_dataloader("dev", batch_size=8)
 
     trainer = Trainer(
         model=model,
