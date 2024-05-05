@@ -47,35 +47,21 @@ access_token_read = "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"
 access_token_write = "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"
 login(token=access_token_read)
 
+
 def main():    
     tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
     new_tokens = ['[R]', '[C]', '[CAP]']
     tokenizer.add_tokens(new_tokens)
     tokenizer.add_special_tokens({'pad_token': '[PAD]'})
 
-    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+    # data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     training_args = TrainingArguments("test-trainer", evaluation_strategy="epoch")
 
     model = GPT2Model.from_pretrained('gpt2')
 
-    trainer = GPT2Trainer(
-        model = model,
-        tokenizer=tokenizer,
-        dataset_kwargs={
-            "data_dir": "../dataset/few-shot",
-            "max_source_length": 128,
-            "max_target_length": 32,
-        },
-        hparams=training_args,
-        data_collator=data_collator,
-    )
-
     train_dataset = Table2textDataset(tokenizer, data_dir="../dataset/few-shot", type_path="train", max_source_length=384, max_target_length=384)
-    train_loader = DataLoader(train_dataset, batch_size=8, collate_fn=train_dataset.collate_fn, shuffle=True)
-
     eval_dataset = Table2textDataset(tokenizer, data_dir="../dataset/few-shot", type_path="dev", max_source_length=384, max_target_length=384)
-    eval_loader = DataLoader(eval_dataset, batch_size=4, collate_fn=eval_dataset.collate_fn, shuffle=True)
 
     training_args = TrainingArguments(output_dir="test_trainer", evaluation_strategy="epoch")
 
@@ -86,6 +72,7 @@ def main():
         eval_dataset=eval_dataset,
     )
     trainer.train()
+
 
 
 if __name__ == "__main__":
