@@ -4,6 +4,43 @@ import numpy as np
 import evaluate
 from utils import Table2textDataset as AgendaDataset 
 from huggingface_hub import login
+from torch.utils.data import DataLoader
+import logger 
+from transformers import get_linear_schedule_with_warmup
+
+class GPT2Trainer:
+    def __init__(self, tokenizer, dataset_kwargs, hparams):
+        self.tokenizer = tokenizer
+        self.dataset_kwargs = dataset_kwargs
+        self.hparams = hparams
+
+    def get_dataloader(self, type_path: str, batch_size: int, shuffle: bool = False) -> DataLoader:
+        dataset = AgendaDataset(self.tokenizer, type_path=type_path, **self.dataset_kwargs)
+        logger.info('loading %s dataloader...', type_path)
+        dataloader = DataLoader(dataset, batch_size=batch_size, collate_fn=dataset.collate_fn, shuffle=shuffle,
+                                num_workers=20)
+        logger.info('done')
+        return dataloader
+
+    def train_dataloader(self) -> DataLoader:
+        dataloader = self.get_dataloader("train", batch_size=self.hparams.train_batch_size, shuffle=True)
+        t_total = (
+            (len(dataloader.dataset) // (self.hparams.train_batch_size * max(1, self.hparams.n_gpu)))
+            // self.hparams.gradient_accumulation_steps
+            * float(self.hparams.num_train_epochs)
+        )
+        scheduler = get_linear_schedule_with_warmup(
+            self.opt, num_warmup_steps=self.hparams.warmup_steps, num_training_steps=t_total
+        )
+        self.lr_scheduler = scheduler
+        return dataloader
+
+    def val_dataloader(self) -> DataLoader:
+        return self.get_dataloader("dev", batch_size=self.hparams.eval_batch_size)
+
+    def test_dataloader(self) -> DataLoader:
+        return self.get_dataloader("test", batch_size=self.hparams.test_batch_size)
+
 
 access_token_read = "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"
 access_token_write = "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"
@@ -15,34 +52,24 @@ new_tokens = ['[R]', '[C]', '[CAP]']
 tokenizer.add_tokens(new_tokens)
 tokenizer.add_special_tokens({'pad_token': '[PAD]'})
 
-# Define data collator
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
-# Define training arguments
 training_args = TrainingArguments("test-trainer", evaluation_strategy="epoch")
 
-# Load pretrained model
 model = GPT2Model.from_pretrained('gpt2')
 
 def compute_loss(pred):
     return torch.tensor(pred.loss).float().cuda()
 
-# Define Trainer with evaluation metric
-trainer = Trainer(
+trainer = MyGPT2Trainer(
     model=model,
-    args=training_args,
-    train_dataset=AgendaDataset(tokenizer=tokenizer, data_dir="../dataset/train/few-shot", type_path="train"),
-    eval_dataset=AgendaDataset(tokenizer=tokenizer, data_dir="../dataset/development/few-shot", type_path="dev"),
-    data_collator=data_collator,
     tokenizer=tokenizer,
-    compute_metrics=compute_loss,
+    dataset_kwargs={"data_dir": "../dataset/train/few-shot"},
+    hparams=training_args,
 )
 
 # Train the model
-trainer.train()
+trainer.train_dataloader()
 
-# Evaluate the model
-results = trainer.evaluate()
-
-# Print evaluation results
+results = trainer.val_dataloader()
 print(results)
