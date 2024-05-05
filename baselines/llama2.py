@@ -5,9 +5,10 @@ import evaluate
 from utils import Table2textDataset as AgendaDataset 
 from huggingface_hub import login
 from torch.utils.data import DataLoader
-import logger 
 from transformers import get_linear_schedule_with_warmup
+import logging
 
+logger = logging.getLogger(__name__)
 class GPT2Trainer:
     def __init__(self, tokenizer, dataset_kwargs, hparams):
         self.tokenizer = tokenizer
