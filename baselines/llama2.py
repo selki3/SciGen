@@ -91,21 +91,5 @@ def main():
     # Train the model
     trainer.train()
 
-    model_trainer = GPT2Trainer(model=model, tokenizer=tokenizer, dataset_kwargs=args, hparams=training_args)
-
-    # Optionally, predict on dev set and write to output_dir
-    if args["do_predict"]:
-        checkpoints = list(sorted(glob.glob(os.path.join(training_args.output_dir, "*.ckpt"), recursive=True)))
-        if checkpoints:
-            print('Loading weights from {}'.format(checkpoints[-1]))
-            model_trainer = model_trainer.load_from_checkpoint(checkpoints[-1])
-            model_trainer.dataset_kwargs = {
-                "data_dir": args["data_dir"],
-                "max_source_length": args["max_source_length"],
-                "max_target_length": args["max_target_length"],
-            }
-            model_trainer.hparams = training_args
-        trainer.test(model_trainer)
-
 if __name__ == "__main__":
     main()
