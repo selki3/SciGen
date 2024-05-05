@@ -16,19 +16,7 @@ class GPT2Trainer:
         self.tokenizer = tokenizer
         self.dataset_kwargs = dataset_kwargs
         self.hparams = hparams
-        no_decay = ["bias", "LayerNorm.weight"]
-        optimizer_grouped_parameters = [
-            {
-                "params": [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay)],
-                "weight_decay": self.hparams.weight_decay,
-            },
-            {
-                "params": [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay)],
-                "weight_decay": 0.0,
-            },
-        ]
-        optimizer = AdamW(optimizer_grouped_parameters, lr=5e-5, eps=self.hparams.adam_epsilon)
-        self.opt = optimizer
+
 
     def get_dataloader(self, type_path: str, batch_size: int, shuffle: bool = False) -> DataLoader:
         dataset = AgendaDataset(self.tokenizer, type_path=type_path, **self.dataset_kwargs)
@@ -90,7 +78,6 @@ def main():
 
     trainer = GPT2Trainer(
         model=model,
-        args=training_args,
         data_collator=data_collator,
         train_dataset=train_dataloader,
         eval_dataset=eval_dataloader
