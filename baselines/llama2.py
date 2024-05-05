@@ -84,6 +84,7 @@ trainer = GPT2Trainer(
 
 # Train the model
 trainer.train_dataloader()
+trainer.train()
 
-results = trainer.val_dataloader()
+# Print evaluation results
 print(results)
