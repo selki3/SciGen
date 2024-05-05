@@ -11,7 +11,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 class GPT2Trainer:
-    def __init__(self, tokenizer, dataset_kwargs, hparams):
+    def __init__(self, model, tokenizer, dataset_kwargs, hparams):
+        self.model = model
         self.tokenizer = tokenizer
         self.dataset_kwargs = dataset_kwargs
         self.hparams = hparams
@@ -74,6 +75,7 @@ def main():
     model = GPT2Model.from_pretrained('gpt2')
 
     trainer = GPT2Trainer(
+        model = model,
         tokenizer=tokenizer,
         dataset_kwargs={
             "data_dir": "../dataset/few-shot",
