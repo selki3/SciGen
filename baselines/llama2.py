@@ -13,6 +13,7 @@ login(token=access_token_read)
 tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
 new_tokens = ['[R]', '[C]', '[CAP]']
 tokenizer.add_tokens(new_tokens)
+tokenizer.add_special_tokens({'pad_token': '[PAD]'})
 
 # Define data collator
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
