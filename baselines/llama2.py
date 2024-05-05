@@ -72,15 +72,26 @@ def main():
     training_args = TrainingArguments("test-trainer", evaluation_strategy="epoch")
 
     model = GPT2Model.from_pretrained('gpt2')
-    train_dataloader = GPT2Trainer.train_dataloader()
-    eval_dataloader = GPT2Trainer.val_dataloader()
 
-    trainer = Trainer(
+    trainer = GPT2Trainer(
+        tokenizer=tokenizer,
+        dataset_kwargs={
+            "data_dir": "../dataset/few-shot",
+            "max_source_length": 128,
+            "max_target_length": 32,
+        },
+        hparams=training_args,
+    )
+
+    train_dataloader = trainer.train_dataloader()
+    eval_dataloader = trainer.val_dataloader()
+
+    trainer = GPT2Trainer(
         model=model,
         args=training_args,
         data_collator=data_collator,
-        train_dataset= train_dataloader,
-        eval_dataset= eval_dataloader
+        train_dataset=train_dataloader,
+        eval_dataset=eval_dataloader
     )
 
     trainer.train()
