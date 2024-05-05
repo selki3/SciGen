@@ -11,38 +11,6 @@ from torch.utils.data import DataLoader
 
 logger = logging.getLogger(__name__)
 
-class GPT2Trainer:
-    def __init__(self, model, data_collator, tokenizer, dataset_kwargs, hparams):
-        self.model = model
-        self.data_collator = data_collator 
-        self.tokenizer = tokenizer
-        self.dataset_kwargs = dataset_kwargs
-        self.hparams = hparams
-
-    def get_dataloader(self, type_path: str, batch_size: int, shuffle: bool = False) -> DataLoader:
-        dataset = Table2textDataset(self.tokenizer, type_path=type_path, **self.dataset_kwargs)
-        logger.info('loading %s dataloader...', type_path)
-        dataloader = DataLoader(dataset, batch_size=batch_size, collate_fn=dataset.collate_fn, shuffle=shuffle,
-                                num_workers=20)
-        logger.info('done')
-        return dataloader
-
-    def train_dataloader(self) -> DataLoader:
-        dataloader = self.get_dataloader("train", batch_size=self.hparams.train_batch_size, shuffle=True)
-        t_total = (
-            (len(dataloader.dataset) // (self.hparams.train_batch_size * max(1, self.hparams.n_gpu)))
-            // self.hparams.gradient_accumulation_steps
-            * float(self.hparams.num_train_epochs)
-        )
-        return dataloader
-
-    def val_dataloader(self) -> DataLoader:
-        return self.get_dataloader("dev", batch_size=self.hparams.eval_batch_size)
-
-    def test_dataloader(self) -> DataLoader:
-        return self.get_dataloader("test", batch_size=self.hparams.test_batch_size)
-
-
 access_token_read = "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"
 access_token_write = "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"
 login(token=access_token_read)
@@ -72,7 +40,6 @@ def main():
         eval_dataset=eval_dataset,
     )
     trainer.train()
-
 
 
 if __name__ == "__main__":
