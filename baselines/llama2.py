@@ -61,65 +61,51 @@ access_token_read = "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"
 access_token_write = "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"
 login(token=access_token_read)
 
-# Define tokenizer
-tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-new_tokens = ['[R]', '[C]', '[CAP]']
-tokenizer.add_tokens(new_tokens)
-tokenizer.add_special_tokens({'pad_token': '[PAD]'})
-
-data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
-
-training_args = TrainingArguments("test-trainer", evaluation_strategy="epoch")
-
-model = GPT2Model.from_pretrained('gpt2')
-
-def compute_loss(pred):
-    return torch.tensor(pred.loss).float().cuda()
-
-trainer = Trainer(
-    model=model,
-    args=training_args,
-    data_collator=data_collator,
-    train_dataset=AgendaDataset(tokenizer=tokenizer, data_dir="../dataset/few-shot", type_path="train"),
-    eval_dataset=AgendaDataset(tokenizer=tokenizer, data_dir="../dataset/few-shot", type_path="dev"),
-)
-
-# Train the model
-trainer.train()
-
-# Train the model
-trainer.train_dataloader()
-trainer.train()
-
 def main():
-    # Define your arguments here or load them from a configuration file
     args = {
-        "data_dir": "your_data_directory",
+        "data_dir": "data_few_shot",
         "max_source_length": 128,
         "max_target_length": 32,
+        "do_predict": True  
     }
     
-    model = GPT2Trainer(
-        tokenizer=tokenizer,
-        dataset_kwargs=args,
-        hparams=training_args,
+    tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+    new_tokens = ['[R]', '[C]', '[CAP]']
+    tokenizer.add_tokens(new_tokens)
+    tokenizer.add_special_tokens({'pad_token': '[PAD]'})
+
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+
+    training_args = TrainingArguments("test-trainer", evaluation_strategy="epoch")
+
+    model = GPT2Model.from_pretrained('gpt2')
+
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        data_collator=data_collator,
+        train_dataset=AgendaDataset(tokenizer=tokenizer, data_dir="../dataset/few-shot", type_path="train"),
+        eval_dataset=AgendaDataset(tokenizer=tokenizer, data_dir="../dataset/few-shot", type_path="dev"),
     )
 
-    trainer = generic_train(model, training_args)
-    
+    # Train the model
+    trainer.train()
+
+    model_trainer = GPT2Trainer(model=model, tokenizer=tokenizer, dataset_kwargs=args, hparams=training_args)
+
     # Optionally, predict on dev set and write to output_dir
-    if args.do_predict:
-        checkpoints = list(sorted(glob.glob(os.path.join(args.output_dir, "*.ckpt"), recursive=True)))
+    if args["do_predict"]:
+        checkpoints = list(sorted(glob.glob(os.path.join(training_args.output_dir, "*.ckpt"), recursive=True)))
         if checkpoints:
             print('Loading weights from {}'.format(checkpoints[-1]))
-            model = model.load_from_checkpoint(checkpoints[-1])
-            model.dataset_kwargs: dict = dict(
-                data_dir=args.data_dir,
-                max_source_length=args.max_source_length,
-                max_target_length=args.max_target_length,
-            )
-            model.hparams = training_args
-        trainer.test(model)
+            model_trainer = model_trainer.load_from_checkpoint(checkpoints[-1])
+            model_trainer.dataset_kwargs = {
+                "data_dir": args["data_dir"],
+                "max_source_length": args["max_source_length"],
+                "max_target_length": args["max_target_length"],
+            }
+            model_trainer.hparams = training_args
+        trainer.test(model_trainer)
 
 if __name__ == "__main__":
     main()
