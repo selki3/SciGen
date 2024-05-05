@@ -1,7 +1,6 @@
-from transformers import AutoTokenizer, DataCollatorWithPadding
 import torch
 from torch.utils.data import DataLoader
-from transformers import AdamW, get_scheduler
+from transformers import AdamW, get_scheduler, AutoTokenizer, DataCollatorWithPadding
 from tqdm.auto import tqdm
 from utils import Table2textDataset
 

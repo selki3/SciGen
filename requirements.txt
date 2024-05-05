@@ -1,0 +1,8 @@
+!pip install transformers==2.10.0
+!pip install protobuf==3.6.0
+!pip install pytorch-lightning==0.8.1
+!pip install torch==1.5.1
+!pip install bert-score==0.3.3
+!pip install sacrebleu==1.4.12
+!pip install moverscore==1.0.3
+!pip install pyemd

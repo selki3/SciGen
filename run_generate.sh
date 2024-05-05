@@ -40,3 +40,8 @@ python train_table2text_t5.py \
 --max_source_length 384 \
 --max_target_length 384
 	   
+
+python train_table2text_t5.py --data_dir=data_few_shots --model_name_or_path=google-t5/t5-base --learning_rate=3e-5 --num_train_epochs 30 --train_batch_size=8 
+--eval_batch_size=4 
+--test_batch_size=4 --output_dir=output_train_t5 --n_gpu 1 --do_train --do_predict --early_stopping_patience 10  --max_source_length 384 --max_target_length 384
+	   
