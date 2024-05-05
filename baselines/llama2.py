@@ -61,14 +61,7 @@ access_token_read = "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"
 access_token_write = "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"
 login(token=access_token_read)
 
-def main():
-    args = {
-        "data_dir": "data_few_shot",
-        "max_source_length": 128,
-        "max_target_length": 32,
-        "do_predict": True  
-    }
-    
+def main():    
     tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
     new_tokens = ['[R]', '[C]', '[CAP]']
     tokenizer.add_tokens(new_tokens)
@@ -79,17 +72,20 @@ def main():
     training_args = TrainingArguments("test-trainer", evaluation_strategy="epoch")
 
     model = GPT2Model.from_pretrained('gpt2')
+    train_dataloader = model.get_dataloader("train", batch_size=8e, shuffle=True)
+    eval_dataloader = model.get_dataloader("dev", batch_size=8)
 
     trainer = Trainer(
         model=model,
         args=training_args,
         data_collator=data_collator,
-        train_dataset=AgendaDataset(tokenizer=tokenizer, data_dir="../dataset/few-shot", type_path="train"),
-        eval_dataset=AgendaDataset(tokenizer=tokenizer, data_dir="../dataset/few-shot", type_path="dev"),
+        train_dataset= train_dataloader,
+        eval_dataset= eval_dataloader
     )
 
-    # Train the model
     trainer.train()
+    
+    
 
 if __name__ == "__main__":
     main()
