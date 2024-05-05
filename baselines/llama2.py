@@ -67,6 +67,7 @@ def main():
             "max_target_length": 32,
         },
         hparams=training_args,
+        data_collator=data_collator,
     )
 
     train_dataloader = trainer.train_dataloader()
