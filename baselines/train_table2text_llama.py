@@ -335,8 +335,6 @@ def main(args):
             trainer.test(model)
  
 
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     add_generic_args(parser, os.getcwd())

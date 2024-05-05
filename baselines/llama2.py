@@ -1,11 +1,11 @@
 import torch 
-from transformers import AutoTokenizer, DataCollatorWithPadding, TrainingArguments, AutoModelForCausalLM, Trainer, GPT2Tokenizer, GPT2Model
+from transformers import AutoTokenizer, DataCollatorWithPadding, TrainingArguments, AutoModelForCausalLM, Trainer, GPT2Tokenizer, GPT2Model, AdamW
 import numpy as np
 import evaluate
 from utils import Table2textDataset as AgendaDataset 
 from huggingface_hub import login
 from torch.utils.data import DataLoader
-from transformers import get_linear_schedule_with_warmup
+from transformers import get_linear_schedule_with_warmup 
 import logging
 
 logger = logging.getLogger(__name__)
@@ -14,6 +14,19 @@ class GPT2Trainer:
         self.tokenizer = tokenizer
         self.dataset_kwargs = dataset_kwargs
         self.hparams = hparams
+        no_decay = ["bias", "LayerNorm.weight"]
+        optimizer_grouped_parameters = [
+            {
+                "params": [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay)],
+                "weight_decay": self.hparams.weight_decay,
+            },
+            {
+                "params": [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay)],
+                "weight_decay": 0.0,
+            },
+        ]
+        optimizer = AdamW(optimizer_grouped_parameters, lr=5e-5, eps=self.hparams.adam_epsilon)
+        self.opt = optimizer
 
     def get_dataloader(self, type_path: str, batch_size: int, shuffle: bool = False) -> DataLoader:
         dataset = AgendaDataset(self.tokenizer, type_path=type_path, **self.dataset_kwargs)
