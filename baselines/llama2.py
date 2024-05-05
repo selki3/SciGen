@@ -11,6 +11,8 @@ login(token=access_token_read)
 
 # Define tokenizer
 tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+new_tokens = ['[R]', '[C]', '[CAP]']
+tokenizer.add_tokens(new_tokens)
 
 # Define data collator
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
