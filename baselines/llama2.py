@@ -9,6 +9,7 @@ from transformers import get_linear_schedule_with_warmup
 import logging
 
 logger = logging.getLogger(__name__)
+
 class GPT2Trainer:
     def __init__(self, tokenizer, dataset_kwargs, hparams):
         self.tokenizer = tokenizer
@@ -77,7 +78,7 @@ def compute_loss(pred):
 
 trainer = GPT2Trainer(
     tokenizer=tokenizer,
-    dataset_kwargs={"data_dir": "../dataset/train/few-shot"},
+    dataset_kwargs={"data_dir": "../dataset/few-shot"},
     hparams=training_args,
 )
 
