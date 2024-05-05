@@ -4,7 +4,7 @@ import numpy as np
 import evaluate
 from utils import Table2textDataset as AgendaDataset 
 from huggingface_hub import login
-from evaluate import multi_list_bleu, get_lines
+# from evaluate import multi_list_bleu, get_lines
 
 access_token_read = "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"
 access_token_write = "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"
@@ -22,12 +22,12 @@ training_args = TrainingArguments("test-trainer", evaluation_strategy="epoch")
 # Load pretrained model
 model = LlamaForCausalLM.from_pretrained("meta-llama/Llama-2-7b-chat-hf")
 
-# Define BLEU evaluation function
-def eval_bleu(ref_file, pred_file):
-    refs = [get_lines(ref_file)]
-    sys = get_lines(pred_file)
-    bleu = multi_list_bleu(refs, sys) 
-    return {"bleu": bleu}
+# # Define BLEU evaluation function
+# def eval_bleu(ref_file, pred_file):
+#     refs = [get_lines(ref_file)]
+#     sys = get_lines(pred_file)
+#     bleu = multi_list_bleu(refs, sys) 
+#     return {"bleu": bleu}
 
 # Define Trainer with evaluation metric
 trainer = Trainer(

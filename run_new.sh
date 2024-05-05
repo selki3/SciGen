@@ -17,19 +17,22 @@ source activate modelenv
 python --version
 
 pip install transformers
+pip install accelerate -U
 pip install protobuf
 pip install pytorch-lightning
 pip install bert-score
 pip install sacrebleu
 pip install moverscore
 pip install pyemd
+pip install sentencepiece
+pip install huggingface_hub
+
 
 cd SciGen/baselines
 
 python convert_json_files.py -f ../dataset/train/few-shot/train.json -s train
 python convert_json_files.py -f ../dataset/development/few-shot/dev.json -s dev
 python convert_json_files.py -f ../dataset/test/test-CL.json -s test
-
 
 mkdir output_llama2
 mkdir data_few_shot
