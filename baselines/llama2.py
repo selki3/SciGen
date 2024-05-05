@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class GPT2Trainer:
-    def __init__(self, model, data_collator, tokenizer, train_dataset, eval_dataset dataset_kwargs, hparams):
+    def __init__(self, model, data_collator, tokenizer, train_dataset, eval_dataset, dataset_kwargs, hparams):
         self.model = model
         self.data_collator = data_collator 
         self.tokenizer = tokenizer
@@ -86,7 +86,6 @@ def main():
     )
     trainer.train()
 
-    
 
 if __name__ == "__main__":
     main()
