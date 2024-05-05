@@ -4,7 +4,6 @@ import numpy as np
 import evaluate
 from utils import Table2textDataset as AgendaDataset 
 from huggingface_hub import login
-from evaluate import multi_list_bleu, get_lines
 
 access_token_read = "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"
 access_token_write = "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"
