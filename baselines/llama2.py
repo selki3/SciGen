@@ -2,7 +2,7 @@ import torch
 from transformers import AutoTokenizer, DataCollatorWithPadding, TrainingArguments, AutoModelForCausalLM, Trainer, GPT2Tokenizer, GPT2Model, AdamW
 import numpy as np
 import evaluate
-from utils import Table2textDataset as AgendaDataset 
+from utils import Table2textDataset
 from huggingface_hub import login
 from torch.utils.data import DataLoader
 from transformers import get_linear_schedule_with_warmup 
@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class GPT2Trainer:
-    def __init__(self, model, data_collator, tokenizer, dataset_kwargs, hparams):
+    def __init__(self, model, data_collator, tokenizer, train_dataset, eval_dataset dataset_kwargs, hparams):
         self.model = model
         self.data_collator = data_collator 
         self.tokenizer = tokenizer
@@ -19,7 +19,7 @@ class GPT2Trainer:
         self.hparams = hparams
 
     def get_dataloader(self, type_path: str, batch_size: int, shuffle: bool = False) -> DataLoader:
-        dataset = AgendaDataset(self.tokenizer, type_path=type_path, **self.dataset_kwargs)
+        dataset = Table2textDataset(self.tokenizer, type_path=type_path, **self.dataset_kwargs)
         logger.info('loading %s dataloader...', type_path)
         dataloader = DataLoader(dataset, batch_size=batch_size, collate_fn=dataset.collate_fn, shuffle=shuffle,
                                 num_workers=20)
@@ -70,16 +70,20 @@ def main():
         data_collator=data_collator,
     )
 
-    train_dataloader = trainer.train_dataloader()
-    eval_dataloader = trainer.val_dataloader()
+    train_dataset = Table2textDataset(tokenizer, data_dir="data_few_shot", type_path="train", max_source_length=384, max_target_length=384)
+    train_loader = DataLoader(train_dataset, batch_size=8, collate_fn=train_dataset.collate_fn, shuffle=True)
 
-    trainer = GPT2Trainer(
+    eval_dataset = Table2textDataset(tokenizer, data_dir="data_few_shot", type_path="dev", max_source_length=384, max_target_length=384)
+    eval_loader = DataLoader(eval_dataset, batch_size=4, collate_fn=eval_dataset.collate_fn, shuffle=True)
+
+    training_args = TrainingArguments(output_dir="test_trainer", evaluation_strategy="epoch")
+
+    trainer = Trainer(
         model=model,
-        data_collator=data_collator,
-        train_dataset=train_dataloader,
-        eval_dataset=eval_dataloader
+        args=training_args,
+        train_dataset=train_loader ,
+        eval_dataset=eval_loader,
     )
-
     trainer.train()
 
     
