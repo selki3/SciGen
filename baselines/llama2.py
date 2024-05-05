@@ -11,8 +11,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 class GPT2Trainer:
-    def __init__(self, model, tokenizer, dataset_kwargs, hparams):
+    def __init__(self, model, data_collator, tokenizer, dataset_kwargs, hparams):
         self.model = model
+        self.data_collator = data_collator 
         self.tokenizer = tokenizer
         self.dataset_kwargs = dataset_kwargs
         self.hparams = hparams
