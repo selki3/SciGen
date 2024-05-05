@@ -32,7 +32,7 @@ trainer = Trainer(
     model=model,
     args=training_args,
     train_dataset=AgendaDataset(tokenizer=tokenizer, data_dir="../dataset/train/few-shot", type_path="train"),
-    eval_dataset=AgendaDataset(tokenizer=tokenizer, data_dir="../dataset/development/few-shot", type_path="validation"),
+    eval_dataset=AgendaDataset(tokenizer=tokenizer, data_dir="../dataset/development/few-shot", type_path="development"),
     data_collator=data_collator,
     tokenizer=tokenizer,
     compute_metrics=compute_loss,
