@@ -70,10 +70,10 @@ def main():
         data_collator=data_collator,
     )
 
-    train_dataset = Table2textDataset(tokenizer, data_dir="data_few_shot", type_path="train", max_source_length=384, max_target_length=384)
+    train_dataset = Table2textDataset(tokenizer, data_dir="../dataset/few-shot", type_path="train", max_source_length=384, max_target_length=384)
     train_loader = DataLoader(train_dataset, batch_size=8, collate_fn=train_dataset.collate_fn, shuffle=True)
 
-    eval_dataset = Table2textDataset(tokenizer, data_dir="data_few_shot", type_path="dev", max_source_length=384, max_target_length=384)
+    eval_dataset = Table2textDataset(tokenizer, data_dir="../dataset/few-shot", type_path="dev", max_source_length=384, max_target_length=384)
     eval_loader = DataLoader(eval_dataset, batch_size=4, collate_fn=eval_dataset.collate_fn, shuffle=True)
 
     training_args = TrainingArguments(output_dir="test_trainer", evaluation_strategy="epoch")
