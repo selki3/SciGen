@@ -667,4 +667,41 @@ class Table2textBARTDataset(Dataset):
         source_ids, source_mask = trim_batch(input_ids, pad_token_id, attention_mask=masks)
         return {"source_ids": source_ids, "source_mask": source_mask, "target_ids": y}
 
+class Table2textFlanDataset(Dataset):
+    def __init__(
+        self,
+        tokenizer,
+        data_dir="./data/sciLang/",
+        type_path="train",
+        max_source_length=768,
+        max_target_length=512,
+    ):
+        super().__init__()
+        self.tokenizer = tokenizer
+        self.source = encode_file(tokenizer, os.path.join(data_dir, type_path + ".source"), max_source_length)
+        self.target = encode_file(tokenizer, os.path.join(data_dir, type_path + ".target"), max_target_length)
 
+    def __len__(self):
+        return len(self.source)
+
+    def __getitem__(self, index):
+        input_ids = self.source[index]["input_ids"].squeeze()
+        labels = self.target[index]["input_ids"].squeeze()
+        attention_mask = self.source[index]["attention_mask"].squeeze()
+        return {"input_ids": input_ids, "attention_mask": attention_mask, "labels": labels}
+
+
+    @staticmethod
+    def trim_seq2seq_batch(batch, pad_token_id):
+        y = trim_batch(batch["labels"], pad_token_id)
+        input_ids, attention_mask = trim_batch(batch["input_ids"], pad_token_id, attention_mask=batch["attention_mask"])
+        return input_ids, attention_mask, y
+
+    def collate_fn(self, batch):
+        input_ids = torch.stack([x["input_ids"] for x in batch])
+        masks = torch.stack([x["attention_mask"] for x in batch])
+        labels = torch.stack([x["labels"] for x in batch])
+        pad_token_id = self.tokenizer.pad_token_id
+        y = trim_batch(labels, pad_token_id)
+        input_ids, attention_mask = trim_batch(input_ids, pad_token_id, attention_mask=masks)
+        return {"input_ids": input_ids, "attention_mask": attention_mask, "labels": y}
