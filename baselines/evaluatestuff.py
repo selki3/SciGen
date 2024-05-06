@@ -5,10 +5,6 @@ import os
 import sacrebleu as scb
 from moverscore_v2 import get_idf_dict, word_mover_score
 from collections import defaultdict
-from nltk.tokenize import word_tokenize, sent_tokenize
-import nltk
-import evaluate 
-
 
 def compute_meteor(predictions, references, alpha=0.9, beta=3, gamma=0.5):
     scores = [meteor_score.single_meteor_score(ref, pred, alpha=alpha, beta=beta, gamma=gamma)
@@ -17,11 +13,14 @@ def compute_meteor(predictions, references, alpha=0.9, beta=3, gamma=0.5):
     return {"meteor": np.mean(scores)}
 
 def get_lines(fil):
+    lines = []
     with open(fil, 'r') as f:
-        data = f.read()
-    lines = [word_tokenize(sent) for sent in sent_tokenize(data)]
+        for line in f:
+            if line.strip():
+                lines.append(line.strip())
+            else:
+                lines.append('empty')
     return lines
-
 
 if __name__ == '__main__':
 
@@ -39,15 +38,12 @@ if __name__ == '__main__':
     os.system(cmd)
 
     if args.all:
-        bleu = evaluate.load('bleu')
-        bleu_score = bleu.compute(predictions=preds, references=refs)
-        print(f"BLEU: {bleu_score}")
+        bleu = scb.corpus_bleu(preds, [refs])
+        print('BLEU: ', bleu.score)
 
         idf_dict_hyp = get_idf_dict(preds)
         idf_dict_ref = get_idf_dict(refs)
 
-
         scores = word_mover_score(refs, preds, idf_dict_ref, idf_dict_hyp, \
                           stop_words=[], n_gram=1, remove_subwords=True, batch_size=64)
         print('MoverScre mean: ', np.mean(scores), 'MoverScoreMedian: ', np.median(scores))
-
