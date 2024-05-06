@@ -6,6 +6,8 @@ import sacrebleu as scb
 from moverscore_v2 import get_idf_dict, word_mover_score
 from collections import defaultdict
 from nltk.tokenize import word_tokenize
+import nltk
+
 
 def compute_meteor(predictions, references, alpha=0.9, beta=3, gamma=0.5):
     scores = [meteor_score.single_meteor_score(ref, pred, alpha=alpha, beta=beta, gamma=gamma)
