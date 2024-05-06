@@ -1,5 +1,6 @@
-from nltk.translate import meteor_score
 import numpy as np
+
+from nltk.translate import meteor_score
 from argparse import ArgumentParser
 import os
 import sacrebleu as scb
