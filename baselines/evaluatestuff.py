@@ -38,7 +38,7 @@ if __name__ == '__main__':
     os.system(cmd)
 
     if args.all:
-        bleu = scb.corpus_bleu(preds, refs)
+        bleu = scb.corpus_bleu([preds], [refs])
         print('BLEU: ', bleu.score)
 
         idf_dict_hyp = get_idf_dict(preds)
