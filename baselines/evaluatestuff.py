@@ -23,6 +23,7 @@ def get_lines(fil):
 
 
 if __name__ == '__main__':
+    os.environ["MKL_THREADING_LAYER"] = "INTEL"  
 
     parser = ArgumentParser()
     parser.add_argument("-p", "--pred", help="prediction file", required=True)
