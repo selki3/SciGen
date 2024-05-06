@@ -17,7 +17,7 @@ def get_lines(fil):
     with open(fil, 'r') as f:
         for line in f:
             if line.strip():
-                lines.extend(word_tokenize(line.strip()))  # Tokenize each line and extend the list
+                lines.extend(str(word_tokenize(line.strip())))  # Tokenize each line and extend the list
             else:
                 lines.append('empty')
     return lines
