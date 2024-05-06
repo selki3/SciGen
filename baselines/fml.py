@@ -64,6 +64,10 @@ def main():
     bleu = evaluate.load('bleu')
     bleu_score = bleu.compute(predictions=preds, references=refs)
     print(f"BLEU: {bleu_score}")
+    with open("bleu_score.txt", "w") as file:
+        file.write(f"BLEU: {bleu_score}")
+
+print(f"BLEU: {bleu_score}")
 
 
 if __name__ == "__main__":
