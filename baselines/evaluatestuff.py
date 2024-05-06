@@ -1,5 +1,4 @@
 import numpy as np
-
 from nltk.translate import meteor_score
 from argparse import ArgumentParser
 import os
@@ -37,20 +36,17 @@ if __name__ == '__main__':
     print('Meteor score :', compute_meteor(preds, refs))
     cmd = 'bert-score -r '+args.sys +' -c ' + args.pred + ' --lang en'
     os.system(cmd)
+    preds_tokenized = word_tokenize(preds)
+    refs_tokenized = word_tokenize(refs)
 
     if args.all:
-        preds_tokenized = word_tokenize(preds)
-        refs_tokenized = word_tokenize(refs)
-
         bleu = scb.corpus_bleu([preds_tokenized], [[refs_tokenized]])
         print('BLEU: ', bleu.score)
-        idf_dict_hyp = get_idf_dict(preds)
-        idf_dict_ref = get_idf_dict(refs)
 
+        idf_dict_hyp = get_idf_dict(preds_tokenized)
+        idf_dict_ref = get_idf_dict(refs_tokenized)
 
-
-
-        scores = word_mover_score(refs, preds, idf_dict_ref, idf_dict_hyp, \
-                          stop_words=[], n_gram=1, remove_subwords=True, batch_size=64)
+        scores = word_mover_score([refs_tokenized], [preds_tokenized], idf_dict_ref, idf_dict_hyp, \
+                                  stop_words=[], n_gram=1, remove_subwords=True, batch_size=64)
         print('MoverScre mean: ', np.mean(scores), 'MoverScoreMedian: ', np.median(scores))
 
