@@ -16,14 +16,11 @@ def compute_meteor(predictions, references, alpha=0.9, beta=3, gamma=0.5):
     return {"meteor": np.mean(scores)}
 
 def get_lines(fil):
-    lines = []
     with open(fil, 'r') as f:
-        for line in f:
-            if line.strip():
-                lines.append(word_tokenize(line.strip()))  # Tokenize the line
-            else:
-                lines.append('empty')
+        data = f.read()
+    lines = [word_tokenize(sent) for sent in sent_tokenize(data)]
     return lines
+
 
 if __name__ == '__main__':
 
