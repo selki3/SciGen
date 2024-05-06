@@ -5,7 +5,7 @@ import os
 import sacrebleu as scb
 from moverscore_v2 import get_idf_dict, word_mover_score
 from collections import defaultdict
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize, sent_tokenize
 import nltk
 
 
