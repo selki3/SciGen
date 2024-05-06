@@ -5,6 +5,7 @@ import os
 import sacrebleu as scb
 from moverscore_v2 import get_idf_dict, word_mover_score
 from collections import defaultdict
+from nltk.tokenize import word_tokenize
 
 def compute_meteor(predictions, references, alpha=0.9, beta=3, gamma=0.5):
     scores = [meteor_score.single_meteor_score(ref, pred, alpha=alpha, beta=beta, gamma=gamma)
@@ -17,7 +18,7 @@ def get_lines(fil):
     with open(fil, 'r') as f:
         for line in f:
             if line.strip():
-                lines.append(line.strip())
+                lines.append(word_tokenize(line.strip()))  # Tokenize the line
             else:
                 lines.append('empty')
     return lines
@@ -50,3 +51,4 @@ if __name__ == '__main__':
         scores = word_mover_score(refs, preds, idf_dict_ref, idf_dict_hyp, \
                           stop_words=[], n_gram=1, remove_subwords=True, batch_size=64)
         print('MoverScre mean: ', np.mean(scores), 'MoverScoreMedian: ', np.median(scores))
+
