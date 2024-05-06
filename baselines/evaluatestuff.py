@@ -7,6 +7,7 @@ from moverscore_v2 import get_idf_dict, word_mover_score
 from collections import defaultdict
 from nltk.tokenize import word_tokenize, sent_tokenize
 import nltk
+import evaluate 
 
 
 def compute_meteor(predictions, references, alpha=0.9, beta=3, gamma=0.5):
@@ -38,8 +39,9 @@ if __name__ == '__main__':
     os.system(cmd)
 
     if args.all:
-        bleu = scb.corpus_bleu([preds], [refs])
-        print('BLEU: ', bleu.score)
+        bleu = evaluate.load('bleu')
+        bleu_score = bleu.compute(predictions=preds, references=refs)
+        print(f"BLEU: {bleu_score}")
 
         idf_dict_hyp = get_idf_dict(preds)
         idf_dict_ref = get_idf_dict(refs)
