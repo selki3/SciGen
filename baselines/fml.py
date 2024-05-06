@@ -16,7 +16,7 @@ login(token=access_token_read)
 
 
 def main():    
-    tokenizer = GPT2Tokenizer.from_pretrained(google/flan-t5-base)
+    tokenizer = GPT2Tokenizer.from_pretrained('google/flan-t5-base')
     new_tokens = ['[R]', '[C]', '[CAP]']
     tokenizer.add_tokens(new_tokens)
     tokenizer.add_special_tokens({'pad_token': '[PAD]'})
@@ -25,7 +25,7 @@ def main():
 
     training_args = TrainingArguments("test-trainer", evaluation_strategy="epoch")
 
-    model = GPT2Model.from_pretrained(google/flan-t5-base)
+    model = GPT2Model.from_pretrained('google/flan-t5-base')
 
     train_dataset = Table2textDataset(tokenizer, data_dir="../dataset/few-shot", type_path="train", max_source_length=384, max_target_length=384)
     eval_dataset = Table2textDataset(tokenizer, data_dir="../dataset/few-shot", type_path="dev", max_source_length=384, max_target_length=384)
