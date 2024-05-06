@@ -43,10 +43,7 @@ if __name__ == '__main__':
 
         idf_dict_hyp = get_idf_dict(preds)
         idf_dict_ref = get_idf_dict(refs)
-
-
-
-
+        
         scores = word_mover_score(refs, preds, idf_dict_ref, idf_dict_hyp, \
                           stop_words=[], n_gram=1, remove_subwords=True, batch_size=64)
         print('MoverScre mean: ', np.mean(scores), 'MoverScoreMedian: ', np.median(scores))
