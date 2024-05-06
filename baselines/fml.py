@@ -30,7 +30,7 @@ def main():
         per_device_train_batch_size=8,
         per_device_eval_batch_size=8,
         learning_rate=5e-5,
-        num_train_epochs=10,
+        num_train_epochs=15,
         logging_strategy="epoch",
         )
 
