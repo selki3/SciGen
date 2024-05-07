@@ -35,6 +35,7 @@ def main():
         num_train_epochs=15,
         logging_strategy="epoch",
     )
+    train_dataset = Table2textFlanDataset(tokenizer, data_dir="../dataset/few-shot", type_path="train", max_source_length=384, max_target_length=384)
     test_dataset = Table2textFlanDataset(tokenizer, data_dir="../dataset/few-shot", type_path="test", max_source_length=384, max_target_length=384)
     eval_dataset = Table2textFlanDataset(tokenizer, data_dir="../dataset/few-shot", type_path="dev", max_source_length=384, max_target_length=384)
     preds = create_predictions(model, tokenizer, test_dataset)
