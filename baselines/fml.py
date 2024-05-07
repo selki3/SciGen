@@ -5,6 +5,15 @@ import sacrebleu as scb
 from moverscore_v2 import get_idf_dict, word_mover_score
 from utils import Table2textFlanDataset
 
+def create_predictions(model, tokenizer, data):
+    model.eval()
+    preds = []
+    dataloader = DataLoader(data, batch_size=8)
+    for batch in dataloader:
+        outputs = model.generate(input_ids=batch['input_ids'].to(model.device), attention_mask=batch['attention_mask'].to(model.device))
+        decoded_outputs = tokenizer.batch_decode(outputs, skip_special_tokens=True)
+        preds.extend(decoded_outputs)
+    return preds
 
 def main():
     tokenizer = AutoTokenizer.from_pretrained('google/flan-t5-base')
@@ -36,15 +45,6 @@ def main():
     )
     trainer.train()
 
-    def create_predictions(model, tokenizer, data):
-        model.eval()
-        preds = []
-        dataloader = DataLoader(data, batch_size=8)
-        for batch in dataloader:
-            outputs = model.generate(input_ids=batch['input_ids'].to(model.device), attention_mask=batch['attention_mask'].to(model.device))
-            decoded_outputs = tokenizer.batch_decode(outputs, skip_special_tokens=True)
-            preds.extend(decoded_outputs)
-        return preds
     
     def get_references(path):
         with open(path, 'r') as target:
