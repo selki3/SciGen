@@ -63,9 +63,21 @@ def main():
     refs = get_references()   
     bleu = evaluate.load('bleu')
     bleu_score = bleu.compute(predictions=preds, references=refs)
-    print(f"BLEU: {bleu_score}")
+    meteor = evaluate.load('meteor')
+    meteor_score = meteor.compute(predictions=preds, references=refs)
+    moverscore = evaluate.load('moverscore')
+    moverscore_mean = moverscore.compute(predictions=preds, references=refs, aggregation='mean')
+    moverscore_median = moverscore.compute(predictions=preds, references=refs, aggregation='median')
+
+    print(f"Loss: {loss}")
+    print(f"METEOR Score: {meteor_score}")
+    print(f"BLEURT Scores: {bleurt_scores}")
+    print(f"MoverScore Mean: {moverscore_mean}, Median: {moverscore_median}")
     with open("bleu_score.txt", "w") as file:
-        file.write(f"BLEU: {bleu_score}")
+        file.write(f"Loss: {loss}\n")
+        file.write(f"METEOR Score: {meteor_score}\n")
+        file.write(f"BLEURT Scores: {bleurt_scores}\n")
+        file.write(f"MoverScore Mean: {moverscore_mean}, Median: {moverscore_median}\n")
 
 
 if __name__ == "__main__":
