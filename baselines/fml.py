@@ -1,16 +1,8 @@
 import torch 
-from transformers import AutoTokenizer, DataCollatorWithPadding, TrainingArguments, AutoModelForSeq2SeqLM, Trainer, GPT2Tokenizer, GPT2Model, AdamW
+from transformers import AutoTokenizer, TrainingArguments, AutoModelForSeq2SeqLM, Trainer
 import numpy as np
-import evaluate
-from utils import Table2textFlanDataset
-from huggingface_hub import login
-from torch.utils.data import DataLoader
-from transformers import get_linear_schedule_with_warmup 
-import logging
-
-access_token_read = "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"
-access_token_write = "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"
-login(token=access_token_read)
+import sacrebleu as scb
+from moverscore_v2 import get_idf_dict, word_mover_score
 
 def main():
     tokenizer = AutoTokenizer.from_pretrained('google/flan-t5-base')
@@ -21,9 +13,6 @@ def main():
     model = AutoModelForSeq2SeqLM.from_pretrained('google/flan-t5-base')
     model.resize_token_embeddings(len(tokenizer))
 
-    train_dataset = Table2textFlanDataset(tokenizer, data_dir="../dataset/few-shot", type_path="train", max_source_length=384, max_target_length=384)
-    eval_dataset = Table2textFlanDataset(tokenizer, data_dir="../dataset/few-shot", type_path="dev", max_source_length=384, max_target_length=384)
-
     training_args = TrainingArguments(
         output_dir="test_trainer", 
         evaluation_strategy="epoch",
@@ -32,14 +21,13 @@ def main():
         learning_rate=5e-5,
         num_train_epochs=15,
         logging_strategy="epoch",
-        )
+    )
 
     trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
-
     )
     trainer.train()
 
@@ -53,30 +41,29 @@ def main():
             preds.extend(decoded_outputs)
         return preds
     
-    def get_references():
-        with open("../dataset/few-shot/test.target", 'r') as target:
+    def get_references(path):
+        with open(path, 'r') as target:
             references = [line.strip() for line in target]
         return [[ref] for ref in references]
     
     test_dataset = Table2textFlanDataset(tokenizer, data_dir="../dataset/few-shot", type_path="test", max_source_length=384, max_target_length=384)
     preds = create_predictions(model, tokenizer, test_dataset)
-    refs = get_references()   
-    bleu = evaluate.load('bleu')
-    bleu_score = bleu.compute(predictions=preds, references=refs)
-    # meteor = evaluate.load('meteor')
-    # meteor_score = meteor.compute(predictions=preds, references=refs)
-    moverscore = evaluate.load('moverscore')
-    moverscore_mean = moverscore.compute(predictions=preds, references=refs, aggregation='mean')
-    moverscore_median = moverscore.compute(predictions=preds, references=refs, aggregation='median')
+    refs = get_references("../dataset/few-shot/test.target")   
+    bleu = scb.corpus_bleu(preds, [refs])
+    
+    idf_dict_hyp = get_idf_dict(preds)
+    idf_dict_ref = get_idf_dict(refs)
 
-    print(f"Loss: {loss}")
-    print(f"METEOR Score: {meteor_score}")
-    print(f"BLEURT Scores: {bleurt_scores}")
+    scores = word_mover_score(refs, preds, idf_dict_ref, idf_dict_hyp, \
+                        stop_words=[], n_gram=1, remove_subwords=True, batch_size=64)
+    moverscore_mean = np.mean(scores)
+    moverscore_median = np.median(scores)
+
+    print(f"BLEU Scores: {bleu.score}")
     print(f"MoverScore Mean: {moverscore_mean}, Median: {moverscore_median}")
-    with open("bleu_score.txt", "w") as file:
-        file.write(f"Loss: {loss}\n")
-        file.write(f"METEOR Score: {meteor_score}\n")
-        file.write(f"BLEURT Scores: {bleurt_scores}\n")
+   
+    with open("evaluation_scores.txt", "w") as file:
+        file.write(f"BLEU Scores: {bleu.score}\n")
         file.write(f"MoverScore Mean: {moverscore_mean}, Median: {moverscore_median}\n")
 
 
