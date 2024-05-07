@@ -3,6 +3,8 @@ from transformers import AutoTokenizer, TrainingArguments, AutoModelForSeq2SeqLM
 import numpy as np
 import sacrebleu as scb
 from moverscore_v2 import get_idf_dict, word_mover_score
+from utils import Table2textFlanDataset
+
 
 def main():
     tokenizer = AutoTokenizer.from_pretrained('google/flan-t5-base')
@@ -23,8 +25,9 @@ def main():
         logging_strategy="epoch",
     )
     test_dataset = Table2textFlanDataset(tokenizer, data_dir="../dataset/few-shot", type_path="test", max_source_length=384, max_target_length=384)
+    eval_dataset = Table2textFlanDataset(tokenizer, data_dir="../dataset/few-shot", type_path="dev", max_source_length=384, max_target_length=384)
     preds = create_predictions(model, tokenizer, test_dataset)
-    
+
     trainer = Trainer(
         model=model,
         args=training_args,
