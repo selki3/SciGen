@@ -10,11 +10,15 @@ import logging
 def create_predictions(model, tokenizer, data):
     model.eval()
     preds = []
-    dataloader = DataLoader(data, batch_size=8)
+    i = 0
+    dataloader = DataLoader(data, batch_size=4)
     for batch in dataloader:
         outputs = model.generate(input_ids=batch['input_ids'].to(model.device), attention_mask=batch['attention_mask'].to(model.device))
         decoded_outputs = tokenizer.batch_decode(outputs, skip_special_tokens=True)
         preds.extend(decoded_outputs)
+        print(i)
+        print(len(dataloader))
+        i += 1
     return preds
 
 def main():
@@ -32,13 +36,13 @@ def main():
         per_device_train_batch_size=8,
         per_device_eval_batch_size=8,
         learning_rate=5e-5,
-        num_train_epochs=15,
+        num_train_epochs=1,
         logging_strategy="epoch",
     )
     train_dataset = Table2textFlanDataset(tokenizer, data_dir="../dataset/few-shot", type_path="train", max_source_length=384, max_target_length=384)
     test_dataset = Table2textFlanDataset(tokenizer, data_dir="../dataset/few-shot", type_path="test", max_source_length=384, max_target_length=384)
     eval_dataset = Table2textFlanDataset(tokenizer, data_dir="../dataset/few-shot", type_path="dev", max_source_length=384, max_target_length=384)
-    preds = create_predictions(model, tokenizer, test_dataset)
+
 
     trainer = Trainer(
         model=model,
@@ -58,7 +62,11 @@ def main():
     preds = create_predictions(model, tokenizer, test_dataset)
     refs = get_references("../dataset/few-shot/test.target")   
     bleu = scb.corpus_bleu(preds, [refs])
-    
+    with open("predictions.txt", "w") as file:
+        for line in preds:
+	    file.write(line)
+	
+
     idf_dict_hyp = get_idf_dict(preds)
     idf_dict_ref = get_idf_dict(refs)
 
