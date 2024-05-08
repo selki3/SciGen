@@ -1,3 +1,6 @@
+# Overall
+This is my task for comparison of State-of-the-Art NLP models. I compared FLAN-T5-Large, T5-Base, BART-Base and BART-Large. To run my attempt of FLAN-T5-Large, simply navigate to the baseline environment and run flan.py. This should output predicts. Unfortunately due to time constraints and an unsolvable bus error on the HPC I was unable to run Flan at 30 Epochs like the other models.
+
 # SciGen
 
 SciGen is a new dataset for reasoning-aware data-to-text generation from scientific tables.
