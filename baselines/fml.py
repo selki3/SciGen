@@ -64,7 +64,7 @@ def main():
     bleu = scb.corpus_bleu(preds, [refs])
     with open("predictions.txt", "w") as file:
         for line in preds:
-	    file.write(line)
+	        file.write(line)
 	
 
     idf_dict_hyp = get_idf_dict(preds)
