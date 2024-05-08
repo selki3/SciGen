@@ -62,7 +62,7 @@ def main():
     preds = create_predictions(model, tokenizer, test_dataset)
 
     with open("flan_preds.txt", 'w') as file:
-        file.write([line.strip() for line in preds])
+        file.write('\n'.join([line.strip() for line in preds]))
         
     refs = get_references()   
     bleu = evaluate.load('bleu')
