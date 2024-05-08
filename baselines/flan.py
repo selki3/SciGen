@@ -30,7 +30,7 @@ def main():
         per_device_train_batch_size=8,
         per_device_eval_batch_size=8,
         learning_rate=5e-5,
-        num_train_epochs=2,
+        num_train_epochs=10,
         logging_strategy="epoch",
         )
 
@@ -60,10 +60,6 @@ def main():
     
     test_dataset = Table2textFlanDataset(tokenizer, data_dir="../dataset/few-shot", type_path="test", max_source_length=384, max_target_length=384)
     preds = create_predictions(model, tokenizer, test_dataset)
-
-    with open("flan_preds.txt", 'w') as file:
-        file.write('\n'.join([line.strip() for line in preds]))
-
     refs = get_references()   
     bleu = evaluate.load('bleu')
     bleu_score = bleu.compute(predictions=preds, references=refs)
