@@ -63,7 +63,7 @@ def main():
 
     with open("flan_preds.txt", 'w') as file:
         file.write('\n'.join([line.strip() for line in preds]))
-        
+
     refs = get_references()   
     bleu = evaluate.load('bleu')
     bleu_score = bleu.compute(predictions=preds, references=refs)
